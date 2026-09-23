@@ -1,0 +1,123 @@
+<section class="hero">
+  <div>
+    <p class="eyebrow">Carbon Credit Marketplace</p>
+    <h1>Trade Carbon Credits for a Greener Future</h1>
+    <p>Buy and sell environmental credits from renewable-energy and sustainability projects.</p>
+  </div>
+</section>
+
+<section class="container">
+  <h1>Explore Carbon Credits</h1>
+
+  <div class="filters">
+    <div>
+      <label for="search">Search by project</label>
+      <input id="search" type="search" [(ngModel)]="search" (ngModelChange)="filter()">
+    </div>
+
+    <div>
+      <label for="category">Category</label>
+      <select id="category" [(ngModel)]="category" (ngModelChange)="filter()">
+        <option *ngFor="let item of categories" [value]="item">{{ item }}</option>
+      </select>
+    </div>
+  </div>
+
+  <p class="message" aria-live="polite">{{ message }}</p>
+
+  <div class="grid">
+    <article class="card" *ngFor="let credit of credits">
+      <img [src]="credit.image" [alt]="credit.projectName">
+
+      <div class="card-content">
+        <span class="badge">{{ credit.category }}</span>
+        <h2>{{ credit.projectName }}</h2>
+        <p>{{ credit.location }}</p>
+        <p>{{ credit.description }}</p>
+        <strong>₹{{ credit.price }} / credit</strong>
+        <p>{{ credit.availableCredits }} available</p>
+
+        <div class="buy" *ngIf="auth.current()?.role === 'buyer'">
+          <label [for]="'qty-' + credit.id">Quantity</label>
+          <input
+            [id]="'qty-' + credit.id"
+            type="number"
+            min="1"
+            [max]="credit.availableCredits"
+            [(ngModel)]="quantity[credit.id]">
+
+          <button type="button" (click)="add(credit)">
+            Add to Cart
+          </button>
+        </div>
+
+        <p *ngIf="!auth.current()" class="small">
+          Login as a buyer to purchase credits.
+        </p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="auth-section" id="auth" *ngIf="!auth.current()">
+  <div class="form-card">
+    <div class="tabs">
+      <button type="button" [class.active]="authMode === 'login'" (click)="authMode='login'">
+        Login
+      </button>
+      <button type="button" [class.active]="authMode === 'register'" (click)="authMode='register'">
+        Register
+      </button>
+    </div>
+
+    <p class="error" aria-live="polite">{{ authError }}</p>
+
+    <form *ngIf="authMode === 'login'" (ngSubmit)="login()">
+      <h2>Login</h2>
+
+      <label for="loginEmail">Email</label>
+      <input id="loginEmail" type="email" name="email" [(ngModel)]="loginEmail" required>
+
+      <label for="loginPassword">Password</label>
+      <input id="loginPassword" type="password" name="password" [(ngModel)]="loginPassword" required>
+
+      <button type="submit">Login</button>
+
+      <p class="small">
+        Demo buyer: buyer@example.com / 123456
+      </p>
+      <p class="small">
+        Demo seller: seller@example.com / 123456
+      </p>
+    </form>
+
+    <form *ngIf="authMode === 'register'" (ngSubmit)="register()">
+      <h2>Create Account</h2>
+
+      <label for="registerName">Name</label>
+      <input id="registerName" name="name" [(ngModel)]="registerName" required>
+
+      <label for="registerEmail">Email</label>
+      <input id="registerEmail" type="email" name="email" [(ngModel)]="registerEmail" required>
+
+      <label for="registerPassword">Password</label>
+      <input id="registerPassword" type="password" name="password" [(ngModel)]="registerPassword" required>
+
+      <fieldset>
+        <legend>Account type</legend>
+
+        <label>
+          <input type="radio" name="role" value="buyer" [(ngModel)]="registerRole">
+          Buyer
+        </label>
+
+        <label>
+          <input type="radio" name="role" value="seller" [(ngModel)]="registerRole">
+          Seller
+        </label>
+      </fieldset>
+
+      <button type="submit">Register</button>
+    </form>
+  </div>
+</section>

@@ -1,0 +1,38 @@
+<a class="skip" href="#main">Skip to main content</a>
+
+<header class="navbar">
+  <a class="brand" routerLink="/">CarbonTrade</a>
+
+  <button
+    class="menu-btn"
+    type="button"
+    (click)="menuOpen = !menuOpen"
+    [attr.aria-expanded]="menuOpen"
+    aria-label="Open navigation menu">
+    ☰
+  </button>
+
+  <nav [class.open]="menuOpen" aria-label="Main navigation">
+    <a routerLink="/" (click)="menuOpen=false">Marketplace</a>
+
+    <ng-container *ngIf="auth.current() as user">
+      <a *ngIf="user.role === 'buyer'" routerLink="/cart" (click)="menuOpen=false">
+        Cart ({{ cart.getItems().length }})
+      </a>
+      <a routerLink="/dashboard" (click)="menuOpen=false">Dashboard</a>
+      <button type="button" class="nav-button" (click)="logout()">Logout</button>
+    </ng-container>
+
+    <ng-container *ngIf="!auth.current()">
+      <a href="#auth" (click)="menuOpen=false">Login / Register</a>
+    </ng-container>
+  </nav>
+</header>
+
+<main id="main">
+  <router-outlet></router-outlet>
+</main>
+
+<footer>
+  <p>© 2026 CarbonTrade — Simple Carbon Credit Marketplace</p>
+</footer>

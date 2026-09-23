@@ -1,0 +1,115 @@
+<section class="container" *ngIf="user as current">
+  <h1>Dashboard</h1>
+  <p class="message" aria-live="polite">{{ message }}</p>
+
+  <section class="welcome">
+    <h2>Welcome, {{ current.name }}</h2>
+    <p>{{ current.email }} · {{ current.role | titlecase }}</p>
+  </section>
+
+  <div *ngIf="current.role === 'buyer'">
+    <div class="stats">
+      <div><strong>{{ orders.length }}</strong><span>Orders</span></div>
+      <div><strong>{{ totalCredits }}</strong><span>Credits Purchased</span></div>
+      <div><strong>₹{{ totalSpent }}</strong><span>Total Spent</span></div>
+    </div>
+
+    <h2>My Orders</h2>
+
+    <article class="card order" *ngFor="let order of orders">
+      <h3>Order #{{ order.id }}</h3>
+      <p>{{ order.date | date:'medium' }}</p>
+      <p>{{ order.totalCredits }} credits · ₹{{ order.totalPrice }}</p>
+
+      <ul>
+        <li *ngFor="let item of order.items">
+          {{ item.projectName }} — {{ item.quantity }} credits
+        </li>
+      </ul>
+    </article>
+
+    <a class="button-link" routerLink="/">Continue Shopping</a>
+  </div>
+
+  <div *ngIf="current.role === 'seller'">
+    <div class="stats">
+      <div><strong>{{ listings.length }}</strong><span>Listings</span></div>
+      <div><strong>{{ availableCredits }}</strong><span>Available Credits</span></div>
+    </div>
+
+    <section class="form-card">
+      <h2>{{ editingId === null ? 'Add Listing' : 'Edit Listing' }}</h2>
+
+      <label for="project">Project Name</label>
+      <input id="project" [(ngModel)]="listingForm.projectName">
+
+      <label for="cat">Category</label>
+      <select id="cat" [(ngModel)]="listingForm.category">
+        <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+      </select>
+
+      <label for="desc">Description</label>
+      <textarea id="desc" [(ngModel)]="listingForm.description"></textarea>
+
+      <label for="location">Location</label>
+      <input id="location" [(ngModel)]="listingForm.location">
+
+      <label for="price">Price Per Credit</label>
+      <input id="price" type="number" min="1" [(ngModel)]="listingForm.price">
+
+      <label for="available">Available Credits</label>
+      <input id="available" type="number" min="1" [(ngModel)]="listingForm.availableCredits">
+
+      <label for="image">Image URL</label>
+      <input id="image" type="url" [(ngModel)]="listingForm.image">
+
+      <button type="button" (click)="saveListing()">
+        {{ editingId === null ? 'Add Listing' : 'Save Changes' }}
+      </button>
+
+      <button
+        *ngIf="editingId !== null"
+        type="button"
+        class="secondary"
+        (click)="resetListing()">
+        Cancel Edit
+      </button>
+    </section>
+
+    <h2>My Listings</h2>
+
+    <div class="grid">
+      <article class="card" *ngFor="let item of listings">
+        <img [src]="item.image" [alt]="item.projectName">
+        <div class="card-content">
+          <span class="badge">{{ item.category }}</span>
+          <h3>{{ item.projectName }}</h3>
+          <p>₹{{ item.price }} · {{ item.availableCredits }} credits</p>
+
+          <button type="button" (click)="edit(item)">Edit</button>
+          <button type="button" class="danger" (click)="delete(item.id)">Delete</button>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <section class="form-card profile">
+    <h2>Profile</h2>
+
+    <label for="profileName">Name</label>
+    <input id="profileName" [(ngModel)]="profileName">
+
+    <label>Email</label>
+    <input [value]="current.email" disabled>
+
+    <label>Role</label>
+    <input [value]="current.role" disabled>
+
+    <button type="button" (click)="saveProfile()">Update Profile</button>
+  </section>
+</section>
+
+<section class="container" *ngIf="!user">
+  <h1>Please Login</h1>
+  <a class="button-link" routerLink="/">Go to Marketplace</a>
+</section>
